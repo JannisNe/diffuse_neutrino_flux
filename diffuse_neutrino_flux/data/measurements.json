@@ -1,0 +1,79 @@
+{
+  "joint15":
+    {
+      "class":  "SinglePowerLaw",
+      "best_fit_parameters": [2.5, 2.23e-18],
+      "reference_energy_gev": 1e5,
+      "energy_range_gev": [25e3, 2.8e6],
+      "contour_file68": "joint15_contour68.csv",
+      "csv_kwargs": {"delimiter": ",", "index_col":  0},
+      "year": 2015,
+      "journal": "ApJ 809"
+    },
+
+  "joint23_spl":
+  {
+    "class": "SinglePowerLaw",
+    "best_fit_parameters": [2.52, 1.8e-18],
+    "reference_energy_gev": 1e5,
+    "energy_range_gev": [2.5e3, 6.3e6],
+    "contour_file68": "joint23_spl_contour68.csv",
+    "csv_kwargs": {"delimiter": ";", "decimal": ",", "names":  ["gamma", "norm"]},
+    "year": 2023,
+    "journal": "PoS ICRC2023"
+  },
+  "joint23_bpl":
+  {
+    "class": "BrokenPowerLaw",
+    "best_fit_parameters": [1.31, 2.74, 4.39, 1.77e-18],
+    "reference_energy_gev": 1e5,
+    "energy_range_gev": [13.7e3, 4.7e6],
+    "year": 2023,
+    "journal": "PoS(ICRC2023)"
+  },
+  "joint23_lp":
+  {
+    "class": "LogParabola",
+    "best_fit_parameters": [2.57, 0.23, 2.13e-18],
+    "reference_energy_gev": 1e5,
+    "energy_range_gev": [8e3, 2.2e6],
+    "year": 2023,
+    "journal": "PoS(ICRC2023)"
+  },
+
+  "nt22":
+  {
+    "class": "SinglePowerLaw",
+    "best_fit_parameters": [2.37, 1.44e-18],
+    "reference_energy_gev": 1e5,
+    "energy_range_gev": [15e3, 5e6],
+    "contour_file68": "nt22_contour68.csv",
+    "csv_kwargs": {"delimiter": ";", "decimal": ",", "names":  ["gamma", "norm"]},
+    "year": 2022,
+    "journal": "ApJ 928"
+  },
+
+  "cascades20":
+  {
+    "class": "SinglePowerLaw",
+    "best_fit_parameters": [2.53, 1.66e-18],
+    "reference_energy_gev": 1e5,
+    "energy_range_gev": [16e3, 2.6e6],
+    "contour_file68": "cascades20_contour68.csv",
+    "csv_kwargs": {"delimiter": ";", "decimal": ",", "names":  ["gamma", "norm"]},
+    "year": 2020,
+    "journal": "PRL 125"
+  },
+
+  "hese21":
+  {
+    "class": "SinglePowerLaw",
+    "best_fit_parameters": [2.87, 2.12e-18],
+    "reference_energy_gev": 1e5,
+    "energy_range_gev": [16e3, 2.6e6],
+    "contour_file68": "hese21_contour68.csv",
+    "csv_kwargs": {"delimiter": ";", "decimal": ",", "names":  ["gamma", "norm"]},
+    "year": 2021,
+    "journal": "PRD 104"
+  }
+}
