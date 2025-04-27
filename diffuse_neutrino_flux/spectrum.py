@@ -102,6 +102,13 @@ class Spectrum(abc.ABC):
         return Spectrum.from_dict(data[key])
 
     @classmethod
+    def list_available_spectra(cls):
+        summary_file = cls.get_data_dir() / "measurements.json"
+        with summary_file.open("r") as f:
+            data = json.load(f)
+        return list(data.keys())
+
+    @classmethod
     def get_data_dir(cls):
         env = os.environ.get("ICECUBE_DIFFUSE_RESULTS", None)
         if env:
