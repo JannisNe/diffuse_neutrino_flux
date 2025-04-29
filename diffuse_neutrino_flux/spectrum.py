@@ -2,7 +2,7 @@ import logging
 import abc
 import json
 import numpy as np
-from typing import Iterable
+from typing import Iterable, Type
 from matplotlib.collections import FillBetweenPolyCollection
 from matplotlib.lines import Line2D
 from numpy import typing as npt
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class Spectrum(abc.ABC):
-    registry = {}
+    registry: dict[str, Type["Spectrum"]] = {}
 
     def __init__(
         self,
@@ -31,14 +31,14 @@ class Spectrum(abc.ABC):
         self._best_fit_parameters = best_fit_parameters
         self.reference_energy_gev = reference_energy_gev
         self.energy_range_gev = energy_range_gev
-        self.contour_files = {}
+        self.contour_files: dict[float, Path] = {}
         for cl, fn in zip([68, 95], [contour_file68, contour_file95]):
             self.set_contour_file(cl, fn)
         self.csv_kwargs = csv_kwargs if csv_kwargs else {}
         self.year = year
         self.journal = journal
 
-    def set_contour_file(self, cl: float, fn: str | Path):
+    def set_contour_file(self, cl: float, fn: str | Path | None):
         if fn is None:
             logger.debug(f"no contour file for {cl} percent")
             return
@@ -48,12 +48,14 @@ class Spectrum(abc.ABC):
         self.contour_files[cl] = _fn_abs
 
     @abc.abstractmethod
-    def flux(self, e_gev: npt.NDArray[float], *parameters) -> npt.NDArray[float]:
+    def flux(
+        self, e_gev: npt.NDArray[np.float64], *parameters
+    ) -> npt.NDArray[np.float64]:
         pass
 
     def _broadcast_flux(
-        self, e_gev: npt.NDArray[float] | float, *parameters
-    ) -> npt.NDArray[float]:
+        self, e_gev: npt.NDArray[np.float64] | float, *parameters
+    ) -> npt.NDArray[np.float64]:
         _e_gev = np.atleast_1d(e_gev)[..., np.newaxis]
         return self.flux(_e_gev, *parameters).squeeze()
 
@@ -71,15 +73,19 @@ class Spectrum(abc.ABC):
         df = pd.read_csv(self.contour_files[cl], **self.csv_kwargs)
         return df[self.paramater_names]
 
-    def upper(self, cl: float, e_gev: npt.NDArray[float] | float) -> npt.NDArray[float]:
+    def upper(
+        self, cl: float, e_gev: npt.NDArray[np.float64] | float
+    ) -> npt.NDArray[np.float64]:
         f = self._broadcast_flux(e_gev, *self.contour(cl).values.T)
         return np.max(f, axis=f.ndim - 1)
 
-    def lower(self, cl: float, e_gev: npt.NDArray[float] | float) -> npt.NDArray[float]:
+    def lower(
+        self, cl: float, e_gev: npt.NDArray[np.float64] | float
+    ) -> npt.NDArray[np.float64]:
         f = self._broadcast_flux(e_gev, *self.contour(cl).values.T)
         return np.min(f, axis=f.ndim - 1)
 
-    def best(self, e_gev: npt.NDArray[float] | float) -> npt.NDArray[float]:
+    def best(self, e_gev: npt.NDArray[np.float64] | float) -> npt.NDArray[np.float64]:
         return self._broadcast_flux(e_gev, *self.best_fit.values())
 
     def get_energy_range(self, log=True, n=100):
@@ -146,7 +152,9 @@ class SinglePowerLaw(Spectrum):
     def paramater_names(self):
         return ["gamma", "norm"]
 
-    def flux(self, e_gev: npt.NDArray[float], *parameters) -> npt.NDArray[float]:
+    def flux(
+        self, e_gev: npt.NDArray[np.float64], *parameters
+    ) -> npt.NDArray[np.float64]:
         gamma, norm = parameters
         return norm * (e_gev / self.reference_energy_gev) ** -gamma
 
@@ -156,7 +164,9 @@ class BrokenPowerLaw(Spectrum):
     def paramater_names(self):
         return ["gamma1", "gamma2", "log10_break_energy_gev", "norm"]
 
-    def flux(self, e_gev: npt.NDArray[float], *parameters) -> npt.NDArray[float]:
+    def flux(
+        self, e_gev: npt.NDArray[np.float64], *parameters
+    ) -> npt.NDArray[np.float64]:
         gamma1, gamma2, log_break_energy, norm = parameters
         break_energy = 10**log_break_energy
         normg = gamma1 if break_energy > self.reference_energy_gev else gamma2
@@ -171,7 +181,9 @@ class LogParabola(Spectrum):
     def paramater_names(self):
         return ["gamma", "beta", "norm"]
 
-    def flux(self, e_gev: npt.NDArray[float], *parameters) -> npt.NDArray[float]:
+    def flux(
+        self, e_gev: npt.NDArray[np.float64], *parameters
+    ) -> npt.NDArray[np.float64]:
         gamma, beta, norm = parameters
         return norm * (e_gev / self.reference_energy_gev) ** (
             -gamma - beta * np.log10(e_gev / self.reference_energy_gev)
