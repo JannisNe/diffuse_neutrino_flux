@@ -24,7 +24,7 @@ jobs:
         run: poetry install -E dev
 
       - name: Run mypy
-        run: mypy .
+        run: poetry run mypy .
 
       - name: Run Ruff
         uses: astral-sh/ruff-action@v1
@@ -32,4 +32,4 @@ jobs:
           version-file: "pyproject.toml"
 
       - name: Run pytest
-        run: pytest test.py
+        run: poetry run pytest test.py
