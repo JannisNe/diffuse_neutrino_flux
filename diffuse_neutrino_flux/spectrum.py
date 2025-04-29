@@ -3,6 +3,8 @@ import abc
 import json
 import numpy as np
 from typing import Iterable
+from matplotlib.collections import FillBetweenPolyCollection
+from matplotlib.lines import Line2D
 from numpy import typing as npt
 import pandas as pd
 from pathlib import Path
@@ -16,15 +18,15 @@ class Spectrum(abc.ABC):
     registry = {}
 
     def __init__(
-            self,
-            best_fit_parameters: Iterable,
-            energy_range_gev: tuple[float, float],
-            reference_energy_gev: float,
-            contour_file68: str | Path | None = None,
-            contour_file95: str | Path | None = None,
-            csv_kwargs: dict | None = None,
-            year: int | None = None,
-            journal: str | None = None
+        self,
+        best_fit_parameters: Iterable,
+        energy_range_gev: tuple[float, float],
+        reference_energy_gev: float,
+        contour_file68: str | Path | None = None,
+        contour_file95: str | Path | None = None,
+        csv_kwargs: dict | None = None,
+        year: int | None = None,
+        journal: str | None = None,
     ):
         self._best_fit_parameters = best_fit_parameters
         self.reference_energy_gev = reference_energy_gev
@@ -49,7 +51,9 @@ class Spectrum(abc.ABC):
     def flux(self, e_gev: npt.NDArray[float], *parameters) -> npt.NDArray[float]:
         pass
 
-    def _broadcast_flux(self, e_gev: npt.NDArray[float] | float, *parameters) -> npt.NDArray[float]:
+    def _broadcast_flux(
+        self, e_gev: npt.NDArray[float] | float, *parameters
+    ) -> npt.NDArray[float]:
         _e_gev = np.atleast_1d(e_gev)[..., np.newaxis]
         return self.flux(_e_gev, *parameters).squeeze()
 
@@ -79,14 +83,18 @@ class Spectrum(abc.ABC):
         return self._broadcast_flux(e_gev, *self.best_fit.values())
 
     def get_energy_range(self, log=True, n=100):
-        return np.logspace(*np.log10(self.energy_range_gev), n) if log else np.linspace(*self.energy_range_gev, n)
+        return (
+            np.logspace(*np.log10(self.energy_range_gev), n)
+            if log
+            else np.linspace(*self.energy_range_gev, n)
+        )
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         cls.registry[cls.__name__] = cls
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data) -> "Spectrum":
         assert "class" in data, "data must contain a class key"
         _class = data.pop("class")
         assert _class in cls.registry, f"unknown class {_class}"
@@ -94,41 +102,46 @@ class Spectrum(abc.ABC):
         return cls.registry[_class](**data)
 
     @classmethod
-    def from_key(cls, key):
+    def from_key(cls, key) -> "Spectrum":
         summary_file = cls.get_data_dir() / "measurements.json"
         with summary_file.open("r") as f:
             data = json.load(f)
-        assert key in data, f"{key} not in {summary_file}! Available keys: {data.keys()}"
+        assert key in data, (
+            f"{key} not in {summary_file}! Available keys: {data.keys()}"
+        )
         return Spectrum.from_dict(data[key])
 
     @classmethod
-    def list_available_spectra(cls):
+    def list_available_spectra(cls) -> list[str]:
         summary_file = cls.get_data_dir() / "measurements.json"
         with summary_file.open("r") as f:
             data = json.load(f)
         return list(data.keys())
 
     @classmethod
-    def get_data_dir(cls):
+    def get_data_dir(cls) -> Path:
         env = os.environ.get("ICECUBE_DIFFUSE_RESULTS", None)
         if env:
             return Path(env).expanduser().resolve()
         else:
             return Path(__file__).parent / "data"
 
-    def plot_cl(self, cl: float, ax, log=True, energy_scaling=0, **kwargs):
+    def plot_cl(
+        self, cl: float, ax, log=True, energy_scaling=0, **kwargs
+    ) -> FillBetweenPolyCollection:
         e = self.get_energy_range(log=log)
-        scale = e ** energy_scaling
-        return ax.fill_between(e, self.lower(cl, e) * scale, self.upper(cl, e) * scale, **kwargs)
+        scale = e**energy_scaling
+        return ax.fill_between(
+            e, self.lower(cl, e) * scale, self.upper(cl, e) * scale, **kwargs
+        )
 
-    def plot(self, ax, log=True, energy_scaling=0, **kwargs):
+    def plot(self, ax, log=True, energy_scaling=0, **kwargs) -> list[Line2D]:
         e = self.get_energy_range(log=log)
-        scale = e ** energy_scaling
+        scale = e**energy_scaling
         return ax.plot(e, self.best(e) * scale, **kwargs)
 
 
 class SinglePowerLaw(Spectrum):
-
     @property
     def paramater_names(self):
         return ["gamma", "norm"]
@@ -139,14 +152,13 @@ class SinglePowerLaw(Spectrum):
 
 
 class BrokenPowerLaw(Spectrum):
-
     @property
     def paramater_names(self):
         return ["gamma1", "gamma2", "log10_break_energy_gev", "norm"]
 
     def flux(self, e_gev: npt.NDArray[float], *parameters) -> npt.NDArray[float]:
         gamma1, gamma2, log_break_energy, norm = parameters
-        break_energy = 10 ** log_break_energy
+        break_energy = 10**log_break_energy
         normg = gamma1 if break_energy > self.reference_energy_gev else gamma2
         normb = norm * (self.reference_energy_gev / break_energy) ** normg
         pl1 = normb * (e_gev / break_energy) ** -gamma1
@@ -155,11 +167,12 @@ class BrokenPowerLaw(Spectrum):
 
 
 class LogParabola(Spectrum):
-
     @property
     def paramater_names(self):
         return ["gamma", "beta", "norm"]
 
     def flux(self, e_gev: npt.NDArray[float], *parameters) -> npt.NDArray[float]:
         gamma, beta, norm = parameters
-        return norm * (e_gev / self.reference_energy_gev) ** (-gamma - beta * np.log10(e_gev / self.reference_energy_gev))
+        return norm * (e_gev / self.reference_energy_gev) ** (
+            -gamma - beta * np.log10(e_gev / self.reference_energy_gev)
+        )
