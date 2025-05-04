@@ -20,6 +20,9 @@ dev = [
     "mypy (>=1.15.0,<2.0.0)",
 ]
 
+[project.urls]
+Repository = "https://github.com/JannisNe/diffuse_neutrino_flux"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
