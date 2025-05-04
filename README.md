@@ -1,3 +1,5 @@
+[![CI](https://github.com/JannisNe/diffuse_neutrino_flux/actions/workflows/test.yml/badge.svg)](https://github.com/JannisNe/timewise/actions/workflows/test.yml)
+[![PyPI version](https://badge.fury.io/py/diffuse_neutrino_flux.svg)](https://badge.fury.io/py/diffuse_neutrino_flux)
 # Add diffuse neutrino flux measurements to your plots
 
 ## Usage
