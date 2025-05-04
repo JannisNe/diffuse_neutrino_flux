@@ -1,6 +1,6 @@
 [project]
 name = "diffuse-neutrino-flux"
-version = "0.1.0"
+version = "0.2.0"
 description = "Lightweight package to plot diffuse neutrino flux measurements"
 authors = [{name = "Jannis Necker", email="jannis.necker@gmail.com"}]
 license = "MIT"
