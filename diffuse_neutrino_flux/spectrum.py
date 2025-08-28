@@ -108,13 +108,16 @@ class Spectrum(abc.ABC):
         return cls.registry[_class](**data)
 
     @classmethod
-    def from_key(cls, key) -> "Spectrum":
+    def load_summary_file(cls) -> dict:
         summary_file = cls.get_data_dir() / "measurements.json"
         with summary_file.open("r") as f:
             data = json.load(f)
-        assert key in data, (
-            f"{key} not in {summary_file}! Available keys: {data.keys()}"
-        )
+        return data
+
+    @classmethod
+    def from_key(cls, key) -> "Spectrum":
+        data = cls.load_summary_file()
+        assert key in data, f"{key} not in summary file! Available keys: {data.keys()}"
         return Spectrum.from_dict(data[key])
 
     @classmethod
