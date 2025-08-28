@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 from itertools import combinations
 from argparse import ArgumentParser
+from typing import cast
 
 from diffuse_neutrino_flux import Spectrum
 
@@ -15,7 +16,7 @@ def process_2d_scan_contour(
     outfile_path: str | Path,
     delimiter: str = ",",
     decimal: str = ".",
-) -> pd.DataFrame:
+):
     """
     Process a 2D scan contour file and convert it to a 4D format. The 2D file must be a CSV file with a
     multicolumn header containing the 2D scans in columns labeled <param1>-<param2>, <param1>-<param3>, etc.
@@ -48,9 +49,10 @@ def process_2d_scan_contour(
     logger.debug(f"Columns in contour file: {df.columns}")
 
     # Forward-fill missing top-level labels
-    new_columns = []
-    current_top = None
-    for top, sub in df.columns:
+    old_columns = cast(list[tuple[str, str]], df.columns.tolist())
+    new_columns = []  # type: list[tuple[str, str]]
+    current_top = old_columns[0][0]
+    for top, sub in old_columns:
         if not top.startswith("Unnamed"):
             current_top = top
         new_columns.append((current_top, sub))
@@ -94,8 +96,8 @@ def process_2d_scan_contour(
         # Extract the 2D scan for this pair
         p1, p2 = scan_key.split("-")
         scan_df = df[scan_key].copy()
-        scan_df = scan_df.rename(columns={"X": p1, "Y": p2})
-        scan_df = scan_df.dropna(subset=[p1, p2])
+        scan_df = scan_df.rename(columns={"X": p1, "Y": p2})  # type: ignore
+        scan_df = scan_df.dropna(subset=[p1, p2])  # type: ignore
 
         # Fill in best-fit values for the other parameters
         for p_other in set(param_names) - {p1, p2}:
