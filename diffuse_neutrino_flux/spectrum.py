@@ -172,7 +172,11 @@ class BrokenPowerLaw(Spectrum):
     ) -> npt.NDArray[np.float64]:
         gamma1, gamma2, log_break_energy, norm = parameters
         break_energy = 10**log_break_energy
-        normg = gamma1 if break_energy > self.reference_energy_gev else gamma2
+        break_energy = np.atleast_1d(break_energy)
+        gamma1 = np.atleast_1d(gamma1)
+        normg = np.full(break_energy.shape, gamma2)
+        break_mask = break_energy > self.reference_energy_gev
+        normg[break_mask] = gamma1[break_mask]
         normb = norm * (self.reference_energy_gev / break_energy) ** normg
         pl1 = normb * (e_gev / break_energy) ** -gamma1
         pl2 = normb * (e_gev / break_energy) ** -gamma2
