@@ -31,13 +31,13 @@
     "year": 2023,
     "journal": "PoS(ICRC2023)"
   },
-  "combined_fit25_bpl":
+  "joint25_bpl":
   {
     "class": "BrokenPowerLaw",
     "best_fit_parameters": [1.31, 2.735, 4.39, 1.77e-18],
     "reference_energy_gev": 1e5,
     "energy_range_gev": [13.7e3, 4.7e6],
-    "contour_file68": "combinedfit25_bpl_contour68.csv",
+    "contour_file68": "joint2525_bpl_contour68.csv",
     "year": 2025,
     "journal": "arXiv:2507.22234"
   },
