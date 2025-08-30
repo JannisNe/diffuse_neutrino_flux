@@ -95,7 +95,7 @@
     "class": "SinglePowerLaw",
     "best_fit_parameters": [2.7, 21.8e-19],
     "reference_energy_gev": 1e5,
-    "energy_range_gev": [1e3, 3e5],
+    "energy_range_gev": [8.9e2, 6.7e4],
     "year": 2021,
     "contour_file68": "gp_pi0_contour68.csv",
     "journal": "ApJ 891",
