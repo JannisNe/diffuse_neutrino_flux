@@ -75,5 +75,18 @@
     "csv_kwargs": {"delimiter": ";", "decimal": ",", "names":  ["gamma", "norm"]},
     "year": 2021,
     "journal": "PRD 104"
+  },
+
+  "ngc1068":
+  {
+    "class": "SinglePowerLaw",
+    "best_fit_parameters": [3.2, 5.0e-14],
+    "reference_energy_gev": 1e3,
+    "energy_range_gev": [1.5e3, 15e3],
+    "contour_file68": "ngc1068_contour68.csv",
+    "csv_kwargs": {"delimiter": ";", "decimal": ","},
+    "year": 2022,
+    "journal": "Science 378",
+    "diffusify": true
   }
 }
