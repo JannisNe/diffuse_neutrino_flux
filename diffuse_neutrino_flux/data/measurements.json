@@ -90,7 +90,19 @@
     "diffusify": true
   },
 
-  "txs0506":
+  "gp_pi0":
+  {
+    "class": "SinglePowerLaw",
+    "best_fit_parameters": [2.7, 21.8e-19],
+    "reference_energy_gev": 1e5,
+    "energy_range_gev": [8.9e2, 6.7e4],
+    "year": 2021,
+    "contour_file68": "gp_pi0_contour68.csv",
+    "journal": "ApJ 891",
+    "diffusify": true
+  }
+  
+    "txs0506":
   {
     "class": "SinglePowerLaw",
     "best_fit_parameters": [2.0, 0.8e-19],
