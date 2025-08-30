@@ -19,8 +19,8 @@ from diffuse_neutrino_flux import Spectrum
 s = Spectrum.from_key("joint15")
 
 fig, ax = plt.subplots()
-s.plot(ax=ax, label="Joint15", color="blue", energy_scaling=2)
-s.plot_cl(ax=ax, color="blue", alpha=0.5, energy_scaling=2)
+s.plot(ax=ax, label=s.journal, color="blue", energy_scaling=2)
+s.plot_cl(cl=68, ax=ax, color="blue", alpha=0.5, energy_scaling=2)
 ax.set_xlabel("Energy [GeV]")
 ax.set_ylabel("Flux [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]")
 ax.set_xscale("log")

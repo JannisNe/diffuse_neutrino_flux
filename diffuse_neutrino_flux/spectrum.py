@@ -112,13 +112,16 @@ class Spectrum(abc.ABC):
         return cls.registry[_class](**data)
 
     @classmethod
-    def from_key(cls, key) -> "Spectrum":
+    def load_summary_file(cls) -> dict:
         summary_file = cls.get_data_dir() / "measurements.json"
         with summary_file.open("r") as f:
             data = json.load(f)
-        assert key in data, (
-            f"{key} not in {summary_file}! Available keys: {data.keys()}"
-        )
+        return data
+
+    @classmethod
+    def from_key(cls, key) -> "Spectrum":
+        data = cls.load_summary_file()
+        assert key in data, f"{key} not in summary file! Available keys: {data.keys()}"
         return Spectrum.from_dict(data[key])
 
     @classmethod
@@ -173,7 +176,11 @@ class BrokenPowerLaw(Spectrum):
     ) -> npt.NDArray[np.float64]:
         gamma1, gamma2, log_break_energy, norm = parameters
         break_energy = 10**log_break_energy
-        normg = gamma1 if break_energy > self.reference_energy_gev else gamma2
+        break_energy = np.atleast_1d(break_energy)
+        gamma1 = np.atleast_1d(gamma1)
+        normg = np.full(break_energy.shape, gamma2)
+        break_mask = break_energy > self.reference_energy_gev
+        normg[break_mask] = gamma1[break_mask]
         normb = norm * (self.reference_energy_gev / break_energy) ** normg
         pl1 = normb * (e_gev / break_energy) ** -gamma1
         pl2 = normb * (e_gev / break_energy) ** -gamma2
