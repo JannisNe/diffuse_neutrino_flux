@@ -88,5 +88,18 @@
     "year": 2022,
     "journal": "Science 378",
     "diffusify": true
+  },
+
+  "txs0506":
+  {
+    "class": "SinglePowerLaw",
+    "best_fit_parameters": [2.0, 0.8e-19],
+    "reference_energy_gev": 1e5,
+    "energy_range_gev": [3.2e4, 3.66e6],
+    "contour_file68": "txs0506_contour68.csv",
+    "csv_kwargs": {"delimiter": ";", "decimal": ","},
+    "year": 2018,
+    "journal": "Science 361",
+    "diffusify": true
   }
 }
