@@ -88,5 +88,17 @@
     "year": 2022,
     "journal": "Science 378",
     "diffusify": true
+  },
+
+  "gp_pi0":
+  {
+    "class": "SinglePowerLaw",
+    "best_fit_parameters": [2.7, 21.8e-19],
+    "reference_energy_gev": 1e5,
+    "energy_range_gev": [1e3, 3e5],
+    "year": 2021,
+    "contour_file68": "gp_pi0_contour68.csv",
+    "journal": "ApJ 891",
+    "diffusify": true
   }
 }
