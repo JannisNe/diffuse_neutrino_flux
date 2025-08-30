@@ -27,6 +27,7 @@ class Spectrum(abc.ABC):
         csv_kwargs: dict | None = None,
         year: int | None = None,
         journal: str | None = None,
+        diffusify: bool = False,
     ):
         self._best_fit_parameters = best_fit_parameters
         self.reference_energy_gev = reference_energy_gev
@@ -37,6 +38,8 @@ class Spectrum(abc.ABC):
         self.csv_kwargs = csv_kwargs if csv_kwargs else {}
         self.year = year
         self.journal = journal
+        self.diffusify = diffusify
+        self.factor = 1 / (4 * np.pi) if diffusify else 1.0
 
     def set_contour_file(self, cl: float, fn: str | Path | None):
         if fn is None:
@@ -57,7 +60,8 @@ class Spectrum(abc.ABC):
         self, e_gev: npt.NDArray[np.float64] | float, *parameters
     ) -> npt.NDArray[np.float64]:
         _e_gev = np.atleast_1d(e_gev)[..., np.newaxis]
-        return self.flux(_e_gev, *parameters).squeeze()
+        f = self.flux(_e_gev, *parameters) * self.factor  # type: npt.NDArray[np.float64]
+        return f.squeeze()
 
     @property
     @abc.abstractmethod
